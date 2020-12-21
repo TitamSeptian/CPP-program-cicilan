@@ -1,0 +1,19 @@
+Tambah tanggal (dd/mm/yyyy)
+write/read file dari bin sebagai database
+array ??
+data array akan di isi dari primary key yang ada di bin, agar nanti bisa di sort dari data terbaru ke terlama (pk paling gede ke pk paling kecil) ?? bisakah ?
+
+
+data_peminjaman.bin:		
+id_peminjaman(int)
+nama(string)		
+pekerjaan(string)	
+tanggal_dibuat(string)	
+lama_cicilan(int)	
+status(string)			
+pinjaman(int)
+bunga(double)
+bayar(int array)
+kembalian(int array)
+tanggal_bayar(string array)
+cicilan_ke(int)

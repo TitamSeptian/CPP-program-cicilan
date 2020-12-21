@@ -16,20 +16,18 @@ struct DataPeminjaman{
 	int id_peminjaman;
 	string nama;
 	string pekerjaan;
-	string tanggal;
+	string tanggal_dibuat;//
 	int lama_ciciclan;
-	string status;
+	string status;//
 	int pinjaman;
 	double bunga;
 	double total_cicilan;
-};
 
-struct DataCicilan{
-	int id_cicilan;
-	int id_peminjaman;
-	int bayar;
-	int kembalian; // => nullable
-	int cicilan_ke;
+	string tanggal_bayar;
+	int bayar[24];
+	int kembalian[24]; // => nullable
+	int cicilan_ke[24];
+
 };
 void checkDatabase(fstream &data);
 void writeData(fstream &data, int posisi, DataPeminjaman &inputPeminjaman);
@@ -39,26 +37,66 @@ void addPeminjaman(fstream &data);
 void rincian(fstream &data, int posisi, DataPeminjaman &inputPeminjaman);
 void writeData(fstream &data, int posisi, DataPeminjaman &inputPeminjaman);
 void pembayaran(int bulan, double totalCicilan);
+
+int getPilihan(){
+	int pilihan;
+	system("cls"); // for windows
+	//system("clear") // for linux/macOS 
+	cout << "Program Ciciclan " << endl;
+	cout << "Pilih Menu" <<endl;
+	cout << "1. Lihat Cicilan" << endl;
+	cout << "2. Lihat Spesifik Cicilan" << endl;
+	cout << "3. Tambah Cicilan" << endl;
+	cout << "4. Bayar Cicilan" << endl;
+	cout << "5. Selesai" << endl;
+	cout << "Pilih (1-5) :"; cin >> pilihan;
+	cin.ignore(numeric_limits<streamsize>::max(),'\n');
+	return pilihan;
+}
+
 int main()
 {
 	char is_continue;
 	fstream data;
+	int pilihan = getPilihan();
 	checkDatabase(data); // check data.bin
+	while(pilihan != 5){
+		
+		switch(pilihan){
+			case 1:
+				cout << "Lihat Peminjaman" << endl;
+				break;
+			case 2:
+				cout << "Lihat Spesifik Peminjaman" << endl;
+				break;
+			case 3:
+				cout << "Tambah Peminjaman" << endl;
+				addPeminjaman(data);
+				break;
+			case 4:
+				cout << "Bayar Peminjaman" << endl;
+				break;
+			default:
+				cout << "Pilihan tidak ditemukan" << endl;
+				break;
+		}
 
-	label_continue:
-	cout << "SELAMAT DATANG DI PROGRAM"
-	cout << "Pinjaman Baru?(y/n) : ";
-	cin >> is_continue;
-	if ( (is_continue == 'y') | (is_continue == 'Y')){
-		cin.ignore(numeric_limits<streamsize>::max(),'\n');
-		addPeminjaman(data);
-	} else if ((is_continue == 'n') | (is_continue == 'N')){
-		cout << "Lihat Pinjaman Lama";
-		cout << "1. Lihat Peminjaman" << endl;
-		cout << "2. Buka Peminjaman" << endl;
-	} else {
-		goto label_continue;
+		label_continue:
+
+		cout << "Lanjutkan?(y/n) : ";
+		cin >> is_continue;
+
+		if ( (is_continue == 'y') | (is_continue == 'Y')){
+			pilihan = getPilihan();
+		} else if ((is_continue == 'n') | (is_continue == 'N')){
+			break;
+		} else {
+			goto label_continue;
+		}
+
 	}
+	
+	cout << "\n\tTerima Kasih Sudah Menggunakan Program ini ;) " << endl;
 
 	cin.get();
 	return 0;
@@ -69,7 +107,7 @@ void checkDatabase(fstream &data){
 
 	// check file ada atau tidak
 	if (data.is_open()){ // kalo ada database
-		cout << "database ditemukan" << endl;
+		cout << "\tdatabase ditemukan" << endl;
 	} else { // kalo gak ada
 		cout << "database tidak ditemukan, buat database baru" << endl;
 		data.close();
@@ -81,17 +119,6 @@ void writeData(fstream &data, int posisi, DataPeminjaman &inputPeminjaman){
 	data.seekp((posisi - 1)*sizeof(DataPeminjaman), ios::beg); // mengarahkan posisi data
 	data.write(reinterpret_cast<char*>(&inputPeminjaman),sizeof(DataPeminjaman)); // tulis file binary ke konsole
 
-	
-
-	cout <<  endl;
-	cout << "================[Rincian]===============\n";
-	cout << "Nama peminjam : " << inputPeminjaman.nama << endl; 
-	cout << "Nama pekerjaan : " << inputPeminjaman.pekerjaan << endl; 
-	cout << "lama cicilan : " << inputPeminjaman.lama_ciciclan << " bulan" << endl;
-	cout << "Peminjaman : " << inputPeminjaman.pinjaman << endl;
-	cout << "Bunga (%) : " << inputPeminjaman.bunga << "%" << endl;
-	cout << "Bunga (Rupiah) : " << (inputPeminjaman.pinjaman * inputPeminjaman.bunga/100) << endl;
-	cout << "cicilan perbulan sebesar : " << inputPeminjaman.total_cicilan/inputPeminjaman.lama_ciciclan << endl;
 }
 
 int getDataSize(fstream &data){
@@ -151,6 +178,13 @@ void addPeminjaman(fstream &data){
 		case 4 :inputPeminjaman.lama_ciciclan = 24;inputPeminjaman.bunga=1;break;
 		// default : cout << "Terjadi Kesalahan" <<endl;exit(0);break;
 	}
+	time_t now = time(0);
+	char* date_time = ctime(&now);
+
+	inputPeminjaman.status = "BELUM LUNAS";
+	cout << inputPeminjaman.status << endl;
+	inputPeminjaman.tanggal_dibuat = date_time;
+	cout << inputPeminjaman.tanggal_dibuat << endl;
 
 	// cout << bunga << endl;
 	// string tanggal = timePtr->tm_mday << "/" << timePtr->tm_mon << "/" << (timePtr->tm_year+1900);
@@ -158,16 +192,20 @@ void addPeminjaman(fstream &data){
 	inputPeminjaman.total_cicilan = round(inputPeminjaman.pinjaman + (inputPeminjaman.pinjaman * inputPeminjaman.bunga/100));
 	writeData(data, size+1, inputPeminjaman);
 	rincian(data, size+1, inputPeminjaman);
+
 	// pembayaran(inputPeminjaman.bulan, totalCicilan);
 
 	// writeData(data,size+1,inputPeminjaman);
 }
 
 void rincian(fstream &data, int posisi, DataPeminjaman &inputPeminjaman) {
-	system("cls"); //for windows
+	//system("cls"); //for windows
 	//system("clear"); //for linux/ macOS
+	// Mahasiswa RincianPeminjaman;
+	data.read(reinterpret_cast<char*>(&inputPeminjaman),sizeof(DataPeminjaman));
 	cout <<  endl;
 	cout << "================[Rincian]===============\n";
+	cout << "Tanggal : " << inputPeminjaman.tanggal_dibuat << endl; 
 	cout << "Nama peminjam : " << inputPeminjaman.nama << endl; 
 	cout << "Nama pekerjaan : " << inputPeminjaman.pekerjaan << endl; 
 	cout << "lama cicilan : " << inputPeminjaman.lama_ciciclan << " bulan" << endl;
@@ -175,6 +213,7 @@ void rincian(fstream &data, int posisi, DataPeminjaman &inputPeminjaman) {
 	cout << "Bunga (%) : " << inputPeminjaman.bunga << "%" << endl;
 	cout << "Bunga (Rupiah) : " << (inputPeminjaman.pinjaman * inputPeminjaman.bunga/100) << endl;
 	cout << "cicilan perbulan sebesar : " << inputPeminjaman.total_cicilan/inputPeminjaman.lama_ciciclan << endl;
+	cout << "STATUS : " << inputPeminjaman.status << endl;
 }
 
 void pembayaran(int bulan, double totalCicilan){
