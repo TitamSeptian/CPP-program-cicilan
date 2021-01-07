@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <limits>
-// #include <ctime>
+#include <ctime>
 #include <math.h>       
 #include <iomanip>       
 
@@ -52,7 +52,7 @@ string satuan (int a){
 	return "";
 }
 // rekursi
-string terbilang (int b){
+string terbilang (long long b){
 	if (b<=11) {
 		return satuan(b);
 	} else if ((b>11) && (b<=19)){
@@ -90,7 +90,7 @@ int main(){
 	int pilihan = getPilihan(); // mendapatkan pilihan dari menu
 	while(pilihan != 5){
 	checkDatabase(data); // check data.bin
-		size = getDataSize(data);
+		
 		switch(pilihan){
 			case 1:
 				cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
@@ -104,7 +104,7 @@ int main(){
 				cout << "| Lihat Spesifik Cicilan" << endl;
 				cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 				tampilSemuaPeminjaman(data); // fungsi nampilin
-				
+				size = getDataSize(data);
 				if (size > 0){
 					tampiSpesifikPeminjaman(data); // nampilin detail hanya 1 data
 				}
@@ -134,7 +134,7 @@ int main(){
 		}
 
 		label_continue:
-		cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+
 		cout << "|  Lanjutkan?(y/n) : ";
 		cin >> is_continue;
 
@@ -234,10 +234,10 @@ void addPeminjaman(fstream &data){
 	}
 	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 	cout << "|  Nama 			: "; getline(cin, inputPeminjaman.nama);
-	cout << "|  Pekerjaan 			: "; getline(cin, inputPeminjaman.pekerjaan);
-	cout << "|  Tanggal 			: "; getline(cin, inputPeminjaman.tanggal_dibuat);
+	cout << "|  Pekerjaan 		: "; getline(cin, inputPeminjaman.pekerjaan);
+	cout << "|  Tanggal 		: "; getline(cin, inputPeminjaman.tanggal_dibuat);
 
-	cout << "|  Masukan Total Pinjaman 		: "; cin >> inputPeminjaman.pinjaman;
+	cout << "|  Masukan Total Pinjaman : "; cin >> inputPeminjaman.pinjaman;
 	// cout << "masukan lama cicilan : "; cin >> bulan;
 	cout << "| - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n";
 	cout << "|  pilihan lama cicilan (perbulan)\n";
@@ -262,7 +262,7 @@ void addPeminjaman(fstream &data){
 	// time_t now = time(0);
 	// char* date_time = ctime(&now);
 
-	inputPeminjaman.status = "B"; // ini set status
+	inputPeminjaman.status = "BLNS"; // ini set status
 	inputPeminjaman.cicilan_ke = 0;
 	// inputPeminjaman.tanggal = tanggal;
 	inputPeminjaman.total_cicilan = round(inputPeminjaman.pinjaman + (inputPeminjaman.pinjaman * inputPeminjaman.bunga/100));
@@ -286,8 +286,8 @@ void rincian(fstream &data, int posisi, DataPeminjaman &inputPeminjaman) {
 	cout << "|  Peminjaman 				: " << inputPeminjaman.pinjaman << endl;
 	cout << "|  Bunga (%) 				: " << inputPeminjaman.bunga << "%" << endl;
 	cout << "|  Bunga (Rupiah) 			: " << (inputPeminjaman.pinjaman * inputPeminjaman.bunga/100) << endl;
-	cout << "|  cicilan perbulan sebesar		: " << inputPeminjaman.total_cicilan/inputPeminjaman.lama_ciciclan << endl;
-	cout << "|  STATUS 				: " << inputPeminjaman.status << endl;
+	cout << "|  cicilan perbulan sebesar: " << inputPeminjaman.total_cicilan/inputPeminjaman.lama_ciciclan << endl;
+	cout << "|  STATUS 					: " << inputPeminjaman.status << endl;
 	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 }
 
@@ -328,21 +328,21 @@ void tampiSpesifikPeminjaman(fstream &data){
 	cout << endl;
 	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 	cout << "|  Tanggal 			: " << Peminjaman.tanggal_dibuat  << endl;
-	cout << "|  Nama 			: " << Peminjaman.nama  << endl;
+	cout << "|  Nama 				: " << Peminjaman.nama  << endl;
 	cout << "|  Pekerjaan 			: " << Peminjaman.pekerjaan  << endl;
 	cout << "|  Pinjaman 			: " << Peminjaman.pinjaman  << endl;
-	cout << "|  Bunga 			: " << Peminjaman.bunga << "%"  << endl;
+	cout << "|  Bunga 				: " << Peminjaman.bunga << "%"  << endl;
 	cout << "|  Total Cicilan 		: " << Peminjaman.total_cicilan  << endl;
 	cout << "|  Lama Cicilan 		: " << Peminjaman.lama_ciciclan  << endl;
-	cout << "|  Sisa waktu cicilan 		: " << Peminjaman.lama_ciciclan - Peminjaman.cicilan_ke << endl;
+	cout << "|  Sisa waktu cicilan 	: " << Peminjaman.lama_ciciclan - Peminjaman.cicilan_ke << endl;
 	if (Peminjaman.cicilan_ke > 0){
 		cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-		cout << "| ---riwayat pembayaran     				 							" << endl;
+		cout << "|					riwayat pembayaran     				 		" << endl;
 		for (int i = 0; i < Peminjaman.cicilan_ke; i++)
 		{
 			cout << "| - - - - - - - - - - - - - - - - - - - - - - - - - - -" << endl;
 			cout << "|  Pembayran cicilan ke-" << i+1 << endl;
-			cout << "|  bayar 		:" << Peminjaman.bayar[i] << endl;
+			cout << "|  bayar 			:" << Peminjaman.bayar[i] << endl;
 			cout << "|  Tanggal Bayar 	:" << Peminjaman.tanggal_bayar[i] << endl;
 			cout << "|  Kembalian 		:" << Peminjaman.kembalian[i] << endl;
 			cout << "| - - - - - - - - - - - - - - - - - - - - - - - - - - -" << endl;
@@ -410,7 +410,7 @@ void pembayaran(fstream &data){
 	    if ((Peminjaman.cicilan_ke) == Peminjaman.lama_ciciclan)
 	    {
 	    	cout << "|  Pembayaran Lunas";
-	    	Peminjaman.status = "L";
+	    	Peminjaman.status = "LUNAS";
 	    	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 	    }
 
